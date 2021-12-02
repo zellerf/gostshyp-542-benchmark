@@ -36,6 +36,7 @@ def parse_xyz(file):
                 if 'Z-matrix Print:' in line:
                     break
                 splitline = line.split()
+                # skip lines not containing coordinates (Format: Index Type X Y Z)
                 if len(splitline) != 5:
                     continue
                 try:
