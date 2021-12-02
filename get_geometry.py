@@ -19,17 +19,19 @@ def main():
 # file[in]: filename zo parse
 # coordinates[return]: list of xyz coordinates
 def parse_xyz(file):
-    coordinates = []
-    opt_conv = []
+    coordinates = [] # list of coordinates
+    opt_conv = [] # linenumbers of Optimization converged
     try:
         with open(file) as ifile:
             lines = ifile.readlines()
             for line in lines:
                 if "OPTIMIZATION CONVERGED" in line:
                     opt_conv.append(lines.index(line))
+            # Optimization converged must occur exactly once
             if len(opt_conv) != 1:
                 print('unconverged geometry or multiple jobs in ' + file)
                 exit(1)
+            # read coordinates
             for line in lines[opt_conv[0]:]:
                 if 'Z-matrix Print:' in line:
                     break
