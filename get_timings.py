@@ -4,16 +4,19 @@ import sys
 
 def parse_scf_timings(filename):
     scf_times, scf_cylces = [], []
+    # counters for number of input files detected and for finished calcs, only for error detection
     input_detected, calc_finished = 0, 0
 
     try:
         with open(filename) as file:
             lines = file.readlines()
             for line in lines:
+                # check file if only contains ONE finished calculation
                 if 'User input:' in line:
                     input_detected += 1
                 if 'Thank you very much for using Q-Chem.  Have a nice day.' in line:
                     calc_finished += 1
+                # get number of scf cycles in of this SCF
                 if 'Convergence criterion met' in line:
                     try:
                         splitline = line.split()
@@ -22,6 +25,7 @@ def parse_scf_timings(filename):
                     except IOError:
                         print('Error while reading SCF cycles ' + filename)
                         exit(1)
+                # get SCF time
                 if 'SCF time:' in line:
                     try:
                         splitline = line.split()
@@ -34,6 +38,7 @@ def parse_scf_timings(filename):
         print('cannot open ' + filename)
         exit(1)
 
+    # crash if file didnt contain only one calc or was crashed
     if input_detected != 1:
         print('Error: multiple calcs detected in ' + filename)
         exit(1)
@@ -44,6 +49,7 @@ def parse_scf_timings(filename):
         print('Error: bad data detected in ' + filename + ' while reading SCF timings')
         exit(1)
 
+    # calc SCF time per SCF cycle for each SCF
     timings = []
     for i in range(len(scf_times)):
         timings.append(scf_times[i]/scf_cylces[i])
@@ -53,6 +59,8 @@ def parse_scf_timings(filename):
 
 def main():
     filename = sys.argv[1]
+
+    # get SCF times
     scf_timings = parse_scf_timings(filename)
     print('SCF times /ncycles:')
     for i in scf_timings:
