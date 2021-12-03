@@ -1,6 +1,8 @@
 import sys
 
-# returns list of SCF timings / SCF cycles
+# parses file fo scf times in CPU seconds scaled with number of corresponding SCF cycles
+# filename[in]: string, name of file to parse
+# timings[return] list of CPUs /ncycles
 
 def parse_scf_timings(filename):
     scf_times, scf_cylces = [], []

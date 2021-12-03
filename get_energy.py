@@ -12,7 +12,11 @@ def main():
     print(energy)
     return 0
 
+# Parse file with geometry optimization for final Energy
+# filename[in]: string with filename
+# energy[return]: Final energy in Hartrees
 def parse_energy(filename):
+
     converged = False
     energy = []
 
@@ -20,6 +24,7 @@ def parse_energy(filename):
         with open(filename) as ifile:
             lines = ifile.readlines()
             for line in lines:
+                # get energy
                 if 'Final energy is' in line:
                     try:
                         splitline = line.split()
@@ -27,11 +32,13 @@ def parse_energy(filename):
                     except IOError:
                         print('Error while reading energy in ' + filename)
                         exit(1)
+                # check if converged
                 if "OPTIMIZATION CONVERGED" in line:
                     converged = True
     except IOError:
         print('cannot open ' + filename)
 
+    # check for multiple calculations and unconverged optimization
     if len(energy) != 1:
         print('multiple calculations detected in ' + filename)
         exit(1)
