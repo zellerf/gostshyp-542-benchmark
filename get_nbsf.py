@@ -32,7 +32,7 @@ def parse_nbsf(filename):
                         nbsf.append(int(splitline[5]))
                     except IOError:
                         print('Error while reading number of basis functions in ' + filename)
-                        exit(1)
+                        sys.exit(1)
                 # check if converged
                 if "OPTIMIZATION CONVERGED" in line:
                     converged = True
@@ -43,9 +43,9 @@ def parse_nbsf(filename):
     # -> this is a workaround for a multiple calculations check, since Qchem prints nbsf each optimization cycle
     if sum(nbsf) / len(nbsf) != nbsf[0]:
         print('multiple calculations detected in ' + filename)
-        exit(1)
+        sys.exit(1)
 
     return nbsf[0]
 
 if __name__ == '__main__':
-    exit(main())
+    sys.exit(main())

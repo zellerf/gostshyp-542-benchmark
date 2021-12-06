@@ -41,12 +41,12 @@ def parse_energy(filename):
     # check for multiple calculations and unconverged optimization
     if len(energy) != 1:
         print('multiple calculations detected in ' + filename)
-        exit(1)
+        sys.exit(1)
     if converged == False:
         print('unconverged calculation in ' + filename)
-        exit(1)
+        sys.exit(1)
 
     return energy[0]
 
 if __name__ == '__main__':
-    exit(main())
+    sys.exit(main())

@@ -25,7 +25,7 @@ def parse_scf_timings(filename):
                         scf_cylces.append(int(splitline[0]))
                     except IOError:
                         print('Error while reading SCF cycles ' + filename)
-                        exit(1)
+                        sys.exit(1)
                 # get SCF time
                 if 'SCF time:' in line:
                     try:
@@ -33,22 +33,22 @@ def parse_scf_timings(filename):
                         scf_times.append(float(splitline[3].strip('s')))
                     except IOError:
                         print('Error while reading SCF times in ' + filename)
-                        exit(1)
+                        sys.exit(1)
 
     except IOError:
         print('cannot open ' + filename)
-        exit(1)
+        sys.exit(1)
 
     # crash if file didnt contain only one calc or was crashed
     if input_detected != 1:
         print('Error: multiple calcs detected in ' + filename)
-        exit(1)
+        sys.exit(1)
     if calc_finished != 1:
         print('Error: crashed calculation in ' + filename)
-        exit(1)
+        sys.exit(1)
     if len(scf_times) != len(scf_cylces):
         print('Error: bad data detected in ' + filename + ' while reading SCF timings')
-        exit(1)
+        sys.exit(1)
 
     # calc SCF time per SCF cycle for each SCF
     timings = []
@@ -79,19 +79,19 @@ def parse_grad_times(filename):
                         grad_times.append(float(splitline[3].strip('s')))
                     except IOError:
                         print('Error while reading SCF times in ' + filename)
-                        exit(1)
+                        sys.exit(1)
 
     except IOError:
         print('cannot open ' + filename)
-        exit(1)
+        sys.exit(1)
 
     # crash if file did not contain only one calc or was crashed
     if input_detected != 1:
         print('Error: multiple calcs detected in ' + filename)
-        exit(1)
+        sys.exit(1)
     if calc_finished != 1:
         print('Error: crashed calculation in ' + filename)
-        exit(1)
+        sys.exit(1)
 
     return grad_times
 
@@ -114,4 +114,4 @@ def main():
 
 
 if __name__ == '__main__':
-    exit(main())
+    sys.exit(main())

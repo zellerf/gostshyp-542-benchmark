@@ -30,7 +30,7 @@ def parse_xyz(file):
             # Optimization converged must occur exactly once
             if len(opt_conv) != 1:
                 print('unconverged geometry or multiple jobs in ' + file)
-                exit(1)
+                sys.exit(1)
             # read coordinates
             for line in lines[opt_conv[0]:]:
                 if 'Z-matrix Print:' in line:
@@ -43,13 +43,13 @@ def parse_xyz(file):
                     coordinates.append([float(splitline[2]), float(splitline[3]), float(splitline[4])])
                 except IOError:
                     print('Error while reading xyz geometry!')
-                    exit(1)
+                    sys.exit(1)
     except IOError:
         print('could not open ' + file)
-        exit(1)
+        sys.exit(1)
     ifile.close()
     return coordinates
 
 
 if __name__ == '__main__':
-    exit(main())
+    sys.exit(main())
