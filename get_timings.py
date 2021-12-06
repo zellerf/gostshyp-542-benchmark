@@ -22,7 +22,6 @@ def parse_scf_timings(filename):
                 if 'Convergence criterion met' in line:
                     try:
                         splitline = line.split()
-                        print(splitline)
                         scf_cylces.append(int(splitline[0]))
                     except IOError:
                         print('Error while reading SCF cycles ' + filename)
