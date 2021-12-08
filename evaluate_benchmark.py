@@ -5,7 +5,7 @@ import get_nbsf
 import get_geometry
 import get_timings
 import get_energy
-import plots
+import plot_enrgies
 
 # read data from input file, digest and save in return value
 # filename[in] name of file to extract data from
