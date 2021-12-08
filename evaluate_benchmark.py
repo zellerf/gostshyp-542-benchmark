@@ -1,11 +1,9 @@
 # This is the main function!
 import os, sys
 import statistics
-import get_nbsf
-import get_geometry
-import get_timings
-import get_energy
+import get_nbsf, get_energy, get_geometry, get_timings
 import plot_enrgies
+import plot_scf_times
 
 # read data from input file, digest and save in return value
 # filename[in] name of file to extract data from
@@ -23,7 +21,7 @@ def read_file(filename):
     # read geometry
     data['geometry'] = get_geometry.parse_xyz(filename)
 
-
+    # TODO move digestion to plot function
     # get SCF timings
     scf = get_timings.parse_scf_timings(filename)
     data['scf_time'] = [statistics.mean(scf), statistics.stdev(scf)]
@@ -77,7 +75,8 @@ def main():
             sys.exit(1)
 
     #plot
-    plots.plot_energy(out, ref)
+    plot_enrgies.plot_energy(out, ref)
+    plot_scf_times.plot_scf_times(out, ref)
 
     return 0
 
