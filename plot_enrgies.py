@@ -32,4 +32,4 @@ def plot_energy(out, ref):
     ediff.set_yscale('log')
     plt.xlabel("number of basis functions")
     plt.ylabel("$\Delta E$ [Hartree]")
-    fig.savefig("pes.pdf")
+    fig.savefig("energies.pdf")

@@ -2,8 +2,7 @@
 import os, sys
 import statistics
 import get_nbsf, get_energy, get_geometry, get_timings
-import plot_enrgies
-import plot_scf_times
+import plot_enrgies, plot_scf_times, plot_grad_times
 
 # read data from input file, digest and save in return value
 # filename[in] name of file to extract data from
@@ -77,7 +76,7 @@ def main():
     #plot
     plot_enrgies.plot_energy(out, ref)
     plot_scf_times.plot_scf_times(out, ref)
-
+    plot_grad_times.plot_grad_times(out, ref)
     return 0
 
 
