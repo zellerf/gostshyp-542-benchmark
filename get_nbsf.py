@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys
 
+
 # read number of basis functions from file specified by argv and print positions
 def main():
     # get inputfile
@@ -12,6 +13,7 @@ def main():
     print('number of basis functions in file:')
     print(nbsf)
     return 0
+
 
 # Parse file with geometry optimization for number of basis functions
 # filename[in]: string with filename
@@ -27,17 +29,18 @@ def parse_nbsf(filename):
             for line in lines:
                 # get nbsf
                 if 'basis functions' in line:
+                    splitline = line.split()
                     try:
-                        splitline = line.split()
                         nbsf.append(int(splitline[5]))
-                    except IOError:
-                        print('Error while reading number of basis functions in ' + filename)
+                    except ValueError:
+                        print('Error while reading number of basis functions from ' + filename)
                         sys.exit(1)
                 # check if converged
                 if "OPTIMIZATION CONVERGED" in line:
                     converged = True
-    except IOError:
+    except OSError:
         print('cannot open ' + filename)
+        sys.exit(1)
 
     # check if several numbers of basis functions were detected
     # -> this is a workaround for a multiple calculations check, since Qchem prints nbsf each optimization cycle

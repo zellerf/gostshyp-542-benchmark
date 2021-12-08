@@ -5,7 +5,7 @@ import get_nbsf
 import get_geometry
 import get_timings
 import get_energy
-
+import plots
 
 # read data from input file, digest and save in return value
 # filename[in] name of file to extract data from
@@ -18,37 +18,22 @@ import get_energy
 def read_file(filename):
     data = {}
     # read energy
-    try:
-        data['energy'] = get_energy.parse_energy(filename)
-    except IOError:
-        print("Error while reading " + filename + " for energy.")
-        exit(1)
+    data['energy'] = get_energy.parse_energy(filename)
 
     # read geometry
-    try:
-        data['geometry'] = get_geometry.parse_xyz(filename)
-    except IOError:
-        print("Error while reading " + filename + " for geometry.")
+    data['geometry'] = get_geometry.parse_xyz(filename)
+
 
     # get SCF timings
-    try:
-        scf = get_timings.parse_scf_timings(filename)
-        data['scf_time'] = [statistics.mean(scf), statistics.stdev(scf)]
-    except IOError:
-        print("Error while reading " + filename + " for SCF timings.")
+    scf = get_timings.parse_scf_timings(filename)
+    data['scf_time'] = [statistics.mean(scf), statistics.stdev(scf)]
 
     # get gradient timings
-    try:
-        grad = get_timings.parse_grad_times(filename)
-        data['grad_time'] = [statistics.mean(grad), statistics.stdev(grad)]
-    except IOError:
-        print("Error while reading " + filename + " for gradient timings.")
+    grad = get_timings.parse_grad_times(filename)
+    data['grad_time'] = [statistics.mean(grad), statistics.stdev(grad)]
 
     # get number of basis functions
-    try:
-        data['nbsf'] = get_nbsf.parse_nbsf(filename)
-    except IOError:
-        print("Error while reading " + filename + " for number of basis functions.")
+    data['nbsf'] = get_nbsf.parse_nbsf(filename)
 
     return data
 
@@ -61,34 +46,26 @@ def main():
     for root, subdirs, files in os.walk(os.getcwd()):
         for file in files:
             # read out files
-            if file.startswith('.out'):
+            if file.endswith('.out'):
                 # use filename as key
-                key = file.strip('.out')
+                key = file.removesuffix('.out')
                 # check for multiple copies
                 if key in out.keys():
                     print('Error: multiple copies of ' + file)
                     sys.exit(1)
                 else:
-                    try:
-                        out[key] = read_file(file)
-                    except IOError:
-                        print('Error while reading data from ' + file)
-                        sys.exit(1)
+                    out[key] = read_file(root + '/' + file)
 
             # read ref files
-            if file.startswith('.ref'):
+            if file.endswith('.ref'):
                 # use filename as key
-                key = file.strip('.ref')
+                key = file.removesuffix('.ref')
                 # check for multiple copies
                 if key in ref.keys():
                     print('Error: multiple copies of ' + file)
                     sys.exit(1)
                 else:
-                    try:
-                        ref[key] = read_file(file)
-                    except IOError:
-                        print('Error while reading data from ' + file)
-                        sys.exit(1)
+                    ref[key] = read_file(root + '/' + file)
 
     # check that there were as many .ref files as .out
     if len(out.keys()) != len(ref.keys()):
@@ -100,6 +77,7 @@ def main():
             sys.exit(1)
 
     #plot
+    plots.plot_energy(out, ref)
 
     return 0
 

@@ -20,22 +20,22 @@ def parse_scf_timings(filename):
                     calc_finished += 1
                 # get number of scf cycles in of this SCF
                 if 'Convergence criterion met' in line:
+                    splitline = line.split()
                     try:
-                        splitline = line.split()
                         scf_cylces.append(int(splitline[0]))
-                    except IOError:
+                    except ValueError:
                         print('Error while reading SCF cycles ' + filename)
                         sys.exit(1)
                 # get SCF time
                 if 'SCF time:' in line:
+                    splitline = line.split()
                     try:
-                        splitline = line.split()
                         scf_times.append(float(splitline[3].strip('s')))
-                    except IOError:
+                    except ValueError:
                         print('Error while reading SCF times in ' + filename)
                         sys.exit(1)
 
-    except IOError:
+    except OSError:
         print('cannot open ' + filename)
         sys.exit(1)
 
@@ -57,7 +57,9 @@ def parse_scf_timings(filename):
 
     return timings
 
-
+# parses file fo gradient times in CPU seconds
+# filename[in]: string, name of file to parse
+# timings[return] list of gradient times in CPUs
 def parse_grad_times(filename):
     grad_times = []
     # counters for number of input files detected and for finished calcs, only for error detection
@@ -74,14 +76,14 @@ def parse_grad_times(filename):
                     calc_finished += 1
                 # get grad time
                 if ' Gradient time:' in line:
+                    splitline = line.split()
                     try:
-                        splitline = line.split()
                         grad_times.append(float(splitline[3].strip('s')))
-                    except IOError:
-                        print('Error while reading SCF times in ' + filename)
+                    except ValueError:
+                        print('Error while reading gradient times from ' + filename)
                         sys.exit(1)
 
-    except IOError:
+    except OSError:
         print('cannot open ' + filename)
         sys.exit(1)
 

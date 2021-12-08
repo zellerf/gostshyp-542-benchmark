@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys
 
+
 # read molecular positions from file specified by argv and print positions
 def main():
     # get inputfile
