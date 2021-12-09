@@ -2,7 +2,7 @@
 import os, sys
 import statistics
 import get_nbsf, get_energy, get_geometry, get_timings
-import plot_enrgies, plot_scf_times, plot_grad_times
+import plot_enrgies, plot_scf_times, plot_grad_times, plot_displacement
 
 # read data from input file, digest and save in return value
 # filename[in] name of file to extract data from
@@ -35,7 +35,8 @@ def read_file(filename):
     return data
 
 
-def main():
+def main(
+):
     out ={} # dict containing data of all out files
     ref = {} # dict containing data of all ref files
 
@@ -77,6 +78,7 @@ def main():
     plot_enrgies.plot_energy(out, ref)
     plot_scf_times.plot_scf_times(out, ref)
     plot_grad_times.plot_grad_times(out, ref)
+    plot_displacement.plot_displacement(out, ref)
     return 0
 
 
