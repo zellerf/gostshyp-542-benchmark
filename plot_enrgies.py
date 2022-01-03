@@ -1,4 +1,5 @@
 import sys
+import investigate_ediff
 import matplotlib.pyplot as plt
 
 def plot_energy(out, ref):
@@ -16,6 +17,10 @@ def plot_energy(out, ref):
         try:
             nbsf.append(int(out[key]['nbsf']))
             # energy difference between out and reference
+            if abs(float(out[key]['energy'] - ref[key]['energy'])) > 10e-8:
+                # TODO move in general part
+                investigate_ediff.plot_scf_diff(key)
+                print(key)
             energies.append(abs(float(out[key]['energy'] - ref[key]['energy'])))
         except (KeyError, ValueError, TypeError):
             print('Error while digesting energies')
