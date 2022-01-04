@@ -1,8 +1,21 @@
 # This is the main function!
-import os, sys
+import os
 import statistics
-import get_nbsf, get_energy, get_geometry, get_timings
-import plot_enrgies, plot_scf_times, plot_grad_times, plot_displacement
+import sys
+
+# import get functions to read files
+import get_energy
+import get_geometry
+import get_nbsf
+import get_timings
+import check_if_converged
+
+# import plotting scripts
+import plot_displacement
+import plot_enrgies
+import plot_grad_times
+import plot_scf_times
+
 
 # read data from input file, digest and save in return value
 # filename[in] name of file to extract data from
@@ -35,18 +48,29 @@ def read_file(filename):
     return data
 
 
-def main(
-):
-    out ={} # dict containing data of all out files
-    ref = {} # dict containing data of all ref files
-
+def main():
+    out = {}  # dict containing data of all out files
+    ref = {}  # dict containing data of all ref files
+    crashed_out, crashed_ref = [], []
     # parse recursively through all folders/files in current working directory and read data in out/ref
     for root, subdirs, files in os.walk(os.getcwd()):
+        # screen for crashed calcs and to lists
+        for file in files:
+            if file.endswith('.out'):
+                if not check_if_converged.check_convergence(root + '/' + file):
+                    crashed_out.append(file.removesuffix('.out'))
+            elif file.endswith('.ref'):
+                if not check_if_converged.check_convergence(root + '/' + file):
+                    crashed_ref.append(file.removesuffix('.ref'))
+
         for file in files:
             # read out files
             if file.endswith('.out'):
                 # use filename as key
                 key = file.removesuffix('.out')
+                # skip if .out or .ref calc did not converge
+                if key in crashed_out or key in crashed_ref:
+                    continue
                 # check for multiple copies
                 if key in out.keys():
                     print('Error: multiple copies of ' + file)
@@ -58,6 +82,9 @@ def main(
             if file.endswith('.ref'):
                 # use filename as key
                 key = file.removesuffix('.ref')
+                # skip if .out or .ref calc did not converge
+                if key in crashed_out or key in crashed_ref:
+                    continue
                 # check for multiple copies
                 if key in ref.keys():
                     print('Error: multiple copies of ' + file)
@@ -74,7 +101,17 @@ def main(
             print('There are .out calcs without .ref calc.')
             sys.exit(1)
 
-    #plot
+    # evaluate crashs, do nothing if both crashed
+    single_crashs = set(crashed_out) ^ set(crashed_ref)
+    print(crashed_out)
+    print(crashed_ref)
+    print('crashed .out calcs: ' + str(len(crashed_out)))
+    print('crashed .ref calcs: ' + str(len(crashed_ref)))
+    print('calculations with only .ref or .out crashed:')
+    for crash in single_crashs:
+        print(crash)
+
+    # plot
     plot_enrgies.plot_energy(out, ref)
     plot_scf_times.plot_scf_times(out, ref)
     plot_grad_times.plot_grad_times(out, ref)
