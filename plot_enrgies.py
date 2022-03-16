@@ -1,6 +1,8 @@
 import sys
 import investigate_ediff
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 def plot_energy(out, ref):
     # check input parameters for correct data type
@@ -20,7 +22,6 @@ def plot_energy(out, ref):
             if abs(float(out[key]['energy'] - ref[key]['energy'])) > 10e-8:
                 # TODO move in general part
                 investigate_ediff.plot_scf_diff(key)
-                print(key)
             energies.append(abs(float(out[key]['energy'] - ref[key]['energy'])))
         except (KeyError, ValueError, TypeError):
             print('Error while digesting energies')
@@ -31,9 +32,10 @@ def plot_energy(out, ref):
     scf_conv = plt.subplot()
     # add dashed line for SCF convergence thresh
     scf_thresh = [1e-8]*len(nbsf)
-    scf_conv.plot(nbsf, scf_thresh, linestyle='dashed', marker='')
+    scf_conv.plot(nbsf, scf_thresh, marker='')
     ediff.scatter(nbsf, energies, label='$\Delta E$', marker='x')
     scf_conv.set_yscale('log')
+    scf_conv.set_ylim(1e-16, 1e-2)
     ediff.set_yscale('log')
     plt.xlabel("number of basis functions")
     plt.ylabel("$\Delta E$ [Hartree]")

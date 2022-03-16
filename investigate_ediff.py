@@ -40,10 +40,11 @@ def plot_scf_diff(name):
 
     fig = plt.figure()
     energy = plt.subplot()
-    energy.plot(out_energies, label='$E_{out}$', marker='x')
-    energy.plot(ref_energies, label='$E_{ref}$', marker='x')
+    energy.plot(out_energies, label='Q-Chem 5.4.2-dev', marker='x')
+    energy.plot(ref_energies, label='Q-Chem 5.4.1', marker='x')
     plt.xlabel("Optimization cycle")
     plt.ylabel("$E$ [Hartree]")
+    plt.legend()
     fig.savefig(name + ".pdf")
 
 

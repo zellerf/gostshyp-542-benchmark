@@ -1,5 +1,6 @@
 import sys
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def plot_grad_times(out, ref):
@@ -20,7 +21,6 @@ def plot_grad_times(out, ref):
             out_nbsf.append(int(out[key]['nbsf']))
             # energy difference between out and reference
             out_grad_times.append(float(out[key]['grad_time'][0]))
-            out_error.append(float(out[key]['grad_time'][1]))
             ref_nbsf.append(int(ref[key]['nbsf']))
             # energy difference between out and reference
             ref_grad_times.append(float(ref[key]['grad_time'][0]))
@@ -32,14 +32,10 @@ def plot_grad_times(out, ref):
     fig = plt.figure()
     out_times = plt.subplot()
     ref_times = plt.subplot()
-    #out_times.scatter(out_nbsf, out_scf_times, label='screened', marker='o')
-    out_times.errorbar(out_nbsf, out_grad_times, yerr=out_error,
-                       label='screened', fmt='.', markersize='5', capsize=2)
-    ref_times.errorbar(ref_nbsf, ref_grad_times, yerr=ref_error,
-                       label='unscreened', fmt='.', markersize='5', capsize=2)
-    #out_times.set_yscale('log')
-    #ref_times.set_yscale('log')
+    out_times.scatter(out_nbsf, out_grad_times, label='Q-Chem 5.4.2-dev', s=3)
+    ref_times.scatter(ref_nbsf, ref_grad_times, label='Q-Chem 5.4.1', s=3)
     plt.xlabel("number of basis functions")
     plt.ylabel("grad time/ncycles [CPUs]")
     plt.legend()
     fig.savefig("grad_times.pdf")
+
