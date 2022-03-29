@@ -19,7 +19,7 @@ def plot_energy(out, ref):
         try:
             nbsf.append(int(out[key]['nbsf']))
             # energy difference between out and reference
-            if abs(float(out[key]['energy'] - ref[key]['energy'])) > 10e-8:
+            if abs(float(out[key]['energy'] - ref[key]['energy'])) > 10e-6:
                 # TODO move in general part
                 investigate_ediff.plot_scf_diff(key)
             energies.append(abs(float(out[key]['energy'] - ref[key]['energy'])))
@@ -31,8 +31,8 @@ def plot_energy(out, ref):
     ediff = plt.subplot()
     scf_conv = plt.subplot()
     # add dashed line for SCF convergence thresh
-    scf_thresh = [1e-8]*len(nbsf)
-    scf_conv.plot(nbsf, scf_thresh, marker='')
+    geoopt_thresh = [1e-6]*len(nbsf)
+    scf_conv.plot(nbsf, geoopt_thresh, marker='')
     ediff.scatter(nbsf, energies, label='$\Delta E$', marker='x')
     scf_conv.set_yscale('log')
     scf_conv.set_ylim(1e-16, 1e-2)

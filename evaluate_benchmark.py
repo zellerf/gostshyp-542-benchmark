@@ -9,6 +9,7 @@ import get_geometry
 import get_nbsf
 import get_timings
 import check_if_converged
+import get_ntess
 
 # import plotting scripts
 import plot_displacement
@@ -45,6 +46,8 @@ def read_file(filename):
     # get number of basis functions
     data['nbsf'] = get_nbsf.parse_nbsf(filename)
 
+    # get average number of tesserae
+    data['ntess'] = get_ntess.parse_ntess(filename)
     return data
 
 
