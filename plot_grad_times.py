@@ -65,7 +65,7 @@ def plot_grad_times(out, ref):
     ref_times.scatter(ref_ntess, ref_grad_times, label='Q-Chem 5.4.1', s=3)
     ref_times.plot(t, model_ref.predict(t))
     plt.xlabel("number of tesserae")
-    plt.ylabel("grad time/ncycles [CPUs]")
+    plt.ylabel("Time per gradient calculation [CPUs]")
     plt.legend()
     fig.savefig("grad_times_ntess.pdf")
 
@@ -113,7 +113,7 @@ def plot_grad_times(out, ref):
     ref_times.scatter(ref_nbsf, ref_grad_times, label='Q-Chem 5.4.1', s=3)
     ref_times.plot(x_refseq, model_ref.predict(x_refseq))
     plt.xlabel("number of basis functions")
-    plt.ylabel("grad time/ncycles [CPUs]")
+    plt.ylabel("Time per gradient calculation [CPUs]")
     plt.legend()
     fig.savefig("grad_times_nbsf.pdf")
 

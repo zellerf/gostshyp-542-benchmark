@@ -55,17 +55,26 @@ def main():
     out = {}  # dict containing data of all out files
     ref = {}  # dict containing data of all ref files
     crashed_out, crashed_ref = [], []
+    err_max_scf, err_max_opt, err_unkown = 0, 0, 0 # counters for different eror codes
     # parse recursively through all folders/files in current working directory and read data in out/ref
     for root, subdirs, files in os.walk(os.getcwd()):
         # screen for crashed calcs and to lists
         for file in files:
-            if file.endswith('.out'):
-                if not check_if_converged.check_convergence(root + '/' + file):
+            if file.endswith('.out') or file.endswith('.ref'):
+                error = check_if_converged.check_convergence(root + '/' + file)
+                if file.endswith('.out') and error != 0:
                     crashed_out.append(file.removesuffix('.out'))
-            elif file.endswith('.ref'):
-                if not check_if_converged.check_convergence(root + '/' + file):
+                elif file.endswith('.ref') and error != 0:
                     crashed_ref.append(file.removesuffix('.ref'))
+                if error == -1:
+                    err_unkown += 1
+                if error == 2:
+                    err_max_scf += 1
+                if error == 3:
+                    print(file)
+                    err_max_opt += 1
 
+         # read data
         for file in files:
             # read out files
             if file.endswith('.out'):
@@ -104,15 +113,17 @@ def main():
             print('There are .out calcs without .ref calc.')
             sys.exit(1)
 
-    # evaluate crashs, do nothing if both crashed
+    # evaluate crashs
     single_crashs = set(crashed_out) ^ set(crashed_ref)
-    print(crashed_out)
-    print(crashed_ref)
-    print('crashed .out calcs: ' + str(len(crashed_out)))
-    print('crashed .ref calcs: ' + str(len(crashed_ref)))
+    print('total number of crashs: ' + str(len(crashed_out) + len(crashed_ref)))
+    print('crashed Qchem 5.4.2 calcs: ' + str(len(crashed_out)))
+    print('crashed Qchem 5.4.1 calcs: ' + str(len(crashed_ref)))
     print('calculations with only .ref or .out crashed:')
     for crash in single_crashs:
         print(crash)
+    print('crashs due to max scf cycles reached: ' + str(err_max_scf))
+    print('crashs due to max opt cycles reached: ' + str(err_max_opt))
+    print('crashs due to unknown reason: ' + str(err_unkown))
 
     # plot
     plot_enrgies.plot_energy(out, ref)
