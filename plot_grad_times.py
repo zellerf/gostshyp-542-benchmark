@@ -18,20 +18,17 @@ def plot_grad_times(out, ref):
 
     # plot time vs ntess
     # read data from dicts
-    out_ntess, out_grad_times, out_error = [], [], []
-    ref_ntess, ref_grad_times, ref_error = [], [], []
+    out_ntess, out_grad_times= [], []
+    ref_ntess, ref_grad_times= [], []
     # ref and out need to have the same keylist!
     for key in out.keys():
         try:
             out_ntess.append(int(out[key]['ntess']))
-            # energy difference between out and reference
             out_grad_times.append(float(out[key]['grad_time'][0]))
             ref_ntess.append(int(ref[key]['ntess']))
-            # energy difference between out and reference
             ref_grad_times.append(float(ref[key]['grad_time'][0]))
-            ref_error.append(float(ref[key]['grad_time'][1]))
         except (KeyError, ValueError, TypeError, IndexError):
-            print('Error: bad data detected while plotting scf-times')
+            print('Error: bad data detected while plotting grad-times')
             sys.exit(1)
 
     # linear regression

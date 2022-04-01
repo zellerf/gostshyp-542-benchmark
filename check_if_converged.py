@@ -9,14 +9,14 @@ import sys
 # 3 max optimization cycles reached
 
 def check_convergence(filename):
-    conv_counter = 0
+    calc_sucesfull = 0
     error_code = 0
     try:
         with open(filename) as ifile:
             lines = ifile.readlines()
             for line in lines:
                 if 'Thank you very much for using Q-Chem.  Have a nice day' in line:
-                    conv_counter += 1
+                    calc_sucesfull += 1
                 if 'gen_scfman_exception: SCF failed to converge' in line:
                     error_code = 2
                 if 'Maximum optimization cycles reached' in line:
@@ -24,13 +24,16 @@ def check_convergence(filename):
     except IOError:
         print('Error while opening ' + filename)
         sys.exit(1)
-    if conv_counter == 1 and error_code == 0:
+
+    if error_code != 0:
+        return error_code
+    if calc_sucesfull == 1:
         return 0
-    if conv_counter > 1:
+    if calc_sucesfull > 1:
         return 1
-    if conv_counter == 0 and error_code == 0:
-        return -1
-    return error_code
+    # no sucessful calc but no error -> error unknown
+    return -1
+
 
 
 # evaluate errorcode from check_convergence

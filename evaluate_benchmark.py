@@ -10,13 +10,14 @@ import get_nbsf
 import get_timings
 import check_if_converged
 import get_ntess
+import get_memstatic
 
 # import plotting scripts
 import plot_displacement
 import plot_enrgies
 import plot_grad_times
 import plot_scf_times
-
+import plot_static_memusage
 
 # read data from input file, digest and save in return value
 # filename[in] name of file to extract data from
@@ -26,7 +27,8 @@ import plot_scf_times
 #   "grad_time" [float, float] average calculation time for gradient, standard deviation
 #   "scf_time" [float, float] average SCF calc time / SCF cycles, standard deviation
 #   "geometry" [list of floats] final geometry of molecule in xyz coordinates
-def read_file(filename):
+def read_file(filename, plotmem):
+
     data = {}
     # read energy
     data['energy'] = get_energy.parse_energy(filename)
@@ -34,7 +36,6 @@ def read_file(filename):
     # read geometry
     data['geometry'] = get_geometry.parse_xyz(filename)
 
-    # TODO move digestion to plot function
     # get SCF timings
     scf = get_timings.parse_scf_timings(filename)
     data['scf_time'] = [statistics.mean(scf), statistics.stdev(scf)]
@@ -48,10 +49,20 @@ def read_file(filename):
 
     # get average number of tesserae
     data['ntess'] = get_ntess.parse_ntess(filename)
+
+    # get avarage mem static
+    if plotmem:
+        mem = get_memstatic.parse_mem_static(filename)
+        data['mem'] = statistics.mean(mem)
+
     return data
 
 
 def main():
+    plotmem = False
+    if sys.argv [1] == "-plotmem=true":
+        plotmem = True
+        print("enabling memory evaluation")
     out = {}  # dict containing data of all out files
     ref = {}  # dict containing data of all ref files
     crashed_out, crashed_ref = [], []
@@ -71,7 +82,6 @@ def main():
                 if error == 2:
                     err_max_scf += 1
                 if error == 3:
-                    print(file)
                     err_max_opt += 1
 
          # read data
@@ -88,7 +98,7 @@ def main():
                     print('Error: multiple copies of ' + file)
                     sys.exit(1)
                 else:
-                    out[key] = read_file(root + '/' + file)
+                    out[key] = read_file(root + '/' + file, plotmem)
 
             # read ref files
             if file.endswith('.ref'):
@@ -102,7 +112,8 @@ def main():
                     print('Error: multiple copies of ' + file)
                     sys.exit(1)
                 else:
-                    ref[key] = read_file(root + '/' + file)
+                    # always pass plotmem false, since mem usage of ref can be calculated
+                    ref[key] = read_file(root + '/' + file, False)
 
     # check that there were as many .ref files as .out
     if len(out.keys()) != len(ref.keys()):
@@ -130,6 +141,8 @@ def main():
     plot_scf_times.plot_scf_times(out, ref)
     plot_grad_times.plot_grad_times(out, ref)
     plot_displacement.plot_displacement(out, ref)
+    if plotmem:
+        plot_static_memusage.plot_memusage(out, ref)
     return 0
 
 
