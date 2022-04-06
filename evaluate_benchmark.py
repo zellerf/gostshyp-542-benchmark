@@ -1,4 +1,6 @@
-# This is the main function!
+# This is the main script
+# usage: python3 evaluate_benmchmark.py
+# use -plotmem=true option to also obtain memory plots. (this needs a manipulated qchem version to work)
 import os
 import statistics
 import sys
@@ -19,17 +21,20 @@ import plot_grad_times
 import plot_scf_times
 import plot_static_memusage
 
-# read data from input file, digest and save in return value
+
+# collect data from input file and store as dictionary
 # filename[in] name of file to extract data from
 # data[return] dict containing keys:
 #   "energy" [float] final energy of optimized geometry
 #   "nbsf" [int] number of basis functions
+#   "ntess" [int] number of tesserae
 #   "grad_time" [float, float] average calculation time for gradient, standard deviation
 #   "scf_time" [float, float] average SCF calc time / SCF cycles, standard deviation
 #   "geometry" [list of floats] final geometry of molecule in xyz coordinates
+#   "mem" [double] avarage mem used by gostshyp through calculation in MB
 def read_file(filename, plotmem):
-
     data = {}
+
     # read energy
     data['energy'] = get_energy.parse_energy(filename)
 
@@ -58,18 +63,25 @@ def read_file(filename, plotmem):
     return data
 
 
+# main function will parse throgh all subdirs and read data from available .ref and .out files
+# will evaluate crashs
+# will plot data
 def main():
+    # enable mem plotting
     plotmem = False
-    if sys.argv [1] == "-plotmem=true":
+    if sys.argv[1] == "-plotmem=true":
         plotmem = True
         print("enabling memory evaluation")
+
     out = {}  # dict containing data of all out files
     ref = {}  # dict containing data of all ref files
+
     crashed_out, crashed_ref = [], []
-    err_max_scf, err_max_opt, err_unkown = 0, 0, 0 # counters for different eror codes
-    # parse recursively through all folders/files in current working directory and read data in out/ref
+    err_max_scf, err_max_opt, err_unkown = 0, 0, 0  # counters for different error codes
+
+    # parse recursively through all folders/files in current working directory and read data in .out/.ref files
     for root, subdirs, files in os.walk(os.getcwd()):
-        # screen for crashed calcs and to lists
+        # screen for crashed calcs and  addto lists
         for file in files:
             if file.endswith('.out') or file.endswith('.ref'):
                 error = check_if_converged.check_convergence(root + '/' + file)
@@ -84,7 +96,7 @@ def main():
                 if error == 3:
                     err_max_opt += 1
 
-         # read data
+        # read data
         for file in files:
             # read out files
             if file.endswith('.out'):
@@ -148,4 +160,3 @@ def main():
 
 if __name__ == '__main__':
     exit(main())
-

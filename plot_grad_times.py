@@ -10,10 +10,10 @@ def plot_grad_times(out, ref):
 
     # check input parameters for correct data type
     if not isinstance(out, dict):
-        print('passed wrong argument to function plot_energy')
+        print('passed wrong argument to function plot_grad_times')
         sys.exit(1)
     if not isinstance(ref, dict):
-        print('passed wrong argument to function plot_energy')
+        print('passed wrong argument to function plot_grad:times')
         sys.exit(1)
 
     # plot time vs ntess
@@ -41,19 +41,19 @@ def plot_grad_times(out, ref):
     model_out = LinearRegression()
     model_out.fit(x_out, y_out)
 
-
     print("Performing linear regression of gradient timings to number of tesserae")
     print("Q-Chem 5.4.1 y-intercept:", model_ref.intercept_)
     print("Q-Chem 5.4.1 slope:", model_ref.coef_)
     print("Q-Chem 5.4.1 R²:", model_ref.score(x_ref, y_ref))
 
     print("Q-Chem 5.4.2 y-intercept:", model_out.intercept_)
-    print("Q-Chem 5.4.2 Steigung:", model_out.coef_)
+    print("Q-Chem 5.4.2 slope:", model_out.coef_)
     print("Q-Chem 5.4.2 R²:", model_out.score(x_out, y_out))
 
     # points to draw regression line
     t = (max(x_out), min(x_out))
 
+    # plot
     fig = plt.figure()
     out_times = plt.subplot()
     ref_times = plt.subplot()
@@ -66,9 +66,7 @@ def plot_grad_times(out, ref):
     plt.legend()
     fig.savefig("grad_times_ntess.pdf")
 
-
     # plot vs nbsf
-    # read data
     out_nbsf, ref_nbsf = [], []
     for key in out.keys():
         try:
@@ -97,11 +95,11 @@ def plot_grad_times(out, ref):
     print("Q-Chem 5.4.2 coeffs:", model_out.named_steps['linearregression'].coef_)
     print("Q-Chem 5.4.2 R²:", model_out.score(x_out, y_out))
 
-    # plot vs. nbsf
     # create data points to plot regression data
     x_outseq = np.linspace(x_out.min(),x_out.max(),500).reshape(-1,1)
     x_refseq = np.linspace(x_ref.min(),x_ref.max(),500).reshape(-1,1)
 
+    # plot
     fig = plt.figure()
     out_times = plt.subplot()
     ref_times = plt.subplot()

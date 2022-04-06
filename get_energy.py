@@ -2,7 +2,7 @@
 import sys
 
 
-# read final SCF energy from file specified by argv and print positions
+# read final SCF energy from file specified by argv and print
 def main():
     # get inputfile
     filename = str(sys.argv[1])
@@ -38,7 +38,7 @@ def parse_energy(filename):
                 if "OPTIMIZATION CONVERGED" in line:
                     converged = True
     except OSError:
-        print('cannot open ' + filename)
+        print('Error while reading energy: cannot open ' + filename)
         sys.exit(1)
 
     # check for multiple calculations and unconverged optimization
@@ -46,8 +46,8 @@ def parse_energy(filename):
         print('multiple calculations detected in ' + filename)
         sys.exit(1)
 
-    if converged == False:
-        print('unconverged calculation in ' + filename)
+    if not converged:
+        print('Error while reading energy: unconverged calculation in ' + filename)
         sys.exit(1)
 
     return energy[0]

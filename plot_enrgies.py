@@ -20,7 +20,6 @@ def plot_energy(out, ref):
             nbsf.append(int(out[key]['nbsf']))
             # energy difference between out and reference
             if abs(float(out[key]['energy'] - ref[key]['energy'])) > 10e-6:
-                # TODO move in general part
                 investigate_ediff.plot_scf_diff(key)
             energies.append(abs(float(out[key]['energy'] - ref[key]['energy'])))
         except (KeyError, ValueError, TypeError):

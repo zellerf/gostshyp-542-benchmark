@@ -2,11 +2,11 @@
 # needs specifically modified gostshypversion that prints mem static
 
 import sys
-import numpy as np
 
-# read static mem usage of gostshyp during for each optimization cycle
+
+# read static mem usage of gostshyp during each optimization cycle
 def main():
-    # get inputfile
+    # get file input
     filename = str(sys.argv[1])
 
     # parse for mem_usage
@@ -19,15 +19,14 @@ def main():
 
 # Parse file for mem_static usage
 # filename[in]: string with filename
-# ntess [return]: mem_static for each opt cycle in MB
+# mem_static [return]: mem_static for each opt cycle in MB
 def parse_mem_static(filename):
-
     mem_static = []
     try:
         with open(filename) as ifile:
             lines = ifile.readlines()
             for line in lines:
-                # get ntess
+                # get mem usage during SCF cycle
                 if 'gostshyp mem_static in MB: ' in line:
                     splitline = line.split()
                     try:
@@ -40,6 +39,7 @@ def parse_mem_static(filename):
         sys.exit(1)
 
     return mem_static
+
 
 if __name__ == '__main__':
     sys.exit(main())

@@ -7,13 +7,12 @@ from sklearn.pipeline import make_pipeline
 
 
 def plot_memusage(out, ref):
-
     # check input parameters for correct data type
     if not isinstance(out, dict):
-        print('passed wrong argument to function plot_energy')
+        print('passed wrong argument to function plot_memusage')
         sys.exit(1)
     if not isinstance(ref, dict):
-        print('passed wrong argument to function plot_energy')
+        print('passed wrong argument to function plot_memusage')
         sys.exit(1)
 
     # read data from dicts
@@ -46,6 +45,7 @@ def plot_memusage(out, ref):
     # points to draw regression line
     t = (max(x_out), min(x_out))
 
+    # plot
     fig = plt.figure()
     out_times = plt.subplot()
     ref_times = plt.subplot()
@@ -68,10 +68,10 @@ def plot_memusage(out, ref):
     print("Q-Chem 5.4.2 coeffs:", model_out.named_steps['linearregression'].coef_)
     print("Q-Chem 5.4.2 R²:", model_out.score(x_out, y_out))
 
-    # plot vs. nbsf
     # create data points to plot regression data
     x_outseq = np.linspace(x_out.min(), x_out.max(), 500).reshape(-1, 1)
 
+    # plot
     fig = plt.figure()
     out_times = plt.subplot()
     ref_times = plt.subplot()

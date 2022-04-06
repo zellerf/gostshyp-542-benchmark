@@ -35,7 +35,6 @@ def check_convergence(filename):
     return -1
 
 
-
 # evaluate errorcode from check_convergence
 def evaluate_errcode(errorcode):
     if errorcode == 0:

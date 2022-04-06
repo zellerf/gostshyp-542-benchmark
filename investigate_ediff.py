@@ -1,8 +1,11 @@
+# this script helps to investigate cases where .out and .ref calc converged, but significalntly differ in energy
+# will plott the energy difference vs. opt cycle
 import sys
 import os
 import matplotlib.pyplot as plt
 
 
+# get data
 def parse_file(filename):
     cycles, energy = [], []
     try:
@@ -23,7 +26,7 @@ def parse_file(filename):
 
 
 def plot_scf_diff(name):
-    # TODO check if string
+
     out_energies, out_cycles = [], []
     ref_energies, ref_cycles = [], []
     for root, subdirs, files in os.walk(os.getcwd()):

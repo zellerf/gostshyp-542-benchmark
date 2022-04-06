@@ -57,6 +57,7 @@ def parse_scf_timings(filename):
 
     return timings
 
+
 # parses file fo gradient times in CPU seconds
 # filename[in]: string, name of file to parse
 # timings[return] list of gradient times in CPUs
