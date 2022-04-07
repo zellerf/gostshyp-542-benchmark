@@ -65,8 +65,7 @@ def plot_grad_times(out, ref):
     plt.ylabel("Time per gradient calculation [CPUs]")
     plt.legend()
     fig.savefig("grad_times_ntess.pdf")
-    plt.cla()
-    plt.clf()
+    plt.close(fig)
 
     # plot vs nbsf
     out_nbsf, ref_nbsf = [], []
@@ -113,8 +112,6 @@ def plot_grad_times(out, ref):
     plt.ylabel("Time per gradient calculation [CPUs]")
     plt.legend()
     fig.savefig("grad_times_nbsf.pdf")
-    plt.cla()
-    plt.clf()
-
+    plt.close(fig)
 
 
