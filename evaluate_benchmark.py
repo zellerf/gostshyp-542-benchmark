@@ -69,7 +69,9 @@ def read_file(filename, plotmem):
 def main():
     # enable mem plotting
     plotmem = False
-    if sys.argv[1] == "-plotmem=true":
+    if len(sys.argv) < 2:
+        pass  # skip for no entry
+    elif sys.argv[1] == "-plotmem=true":
         plotmem = True
         print("enabling memory evaluation")
 

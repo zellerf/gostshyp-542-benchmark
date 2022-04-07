@@ -49,6 +49,8 @@ def plot_scf_diff(name):
     plt.ylabel("$E$ [Hartree]")
     plt.legend()
     fig.savefig(name + ".pdf")
+    plt.cla()
+    plt.clf()
 
 
 def main():

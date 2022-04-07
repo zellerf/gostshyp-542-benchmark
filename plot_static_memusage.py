@@ -56,6 +56,8 @@ def plot_memusage(out, ref):
     plt.ylabel("maximum mem usage [MB]")
     plt.legend()
     fig.savefig("mem_ntess.pdf")
+    plt.cla()
+    plt.clf()
 
     # quadratic regression
     x_out, y_out = np.array(out_nbsf), np.array(out_mem)
@@ -82,6 +84,8 @@ def plot_memusage(out, ref):
     plt.ylabel("maximum mem usage [MB]")
     plt.legend()
     fig.savefig("mem_nbsf.pdf")
+    plt.cla()
+    plt.clf()
 
 
 # max mem usage is easily calculatable for old implementation, since the overlap matrices are not sparse

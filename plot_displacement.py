@@ -41,7 +41,8 @@ def plot_displacement(out, ref):
     plt.xlabel("number of basis functions")
     plt.ylabel("max displacement [$\mathring{A}$]")
     fig.savefig("displacement.pdf")
-
+    plt.cla()
+    plt.clf()
 
 # calculates the maximum displacement between a benchmark calc and a reference calc
 # out_geom[in] np array with data of benchmark calculations

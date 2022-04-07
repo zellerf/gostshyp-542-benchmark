@@ -39,3 +39,5 @@ def plot_energy(out, ref):
     plt.xlabel("number of basis functions")
     plt.ylabel("$\Delta E$ [Hartree]")
     fig.savefig("energies.pdf")
+    plt.cla()
+    plt.clf()
