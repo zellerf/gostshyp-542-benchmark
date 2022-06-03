@@ -80,7 +80,6 @@ def main():
 
     crashed_out, crashed_ref = [], []
     err_max_scf, err_max_opt, err_unkown = 0, 0, 0  # counters for different error codes
-
     # parse recursively through all folders/files in current working directory and read data in .out/.ref files
     for root, subdirs, files in os.walk(os.getcwd()):
         # screen for crashed calcs and  addto lists
