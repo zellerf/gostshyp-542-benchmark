@@ -86,6 +86,7 @@ def plot_grad_times(out, ref):
     ref_times.scatter(ref_ntess, ref_grad_times, label='old implementation', s=3, color='#CC4F1B')
     ref_times.plot(x_ref, y_ref, color='#CC4F1B')
     ref_times.fill_between(x_ref, y_ref-ref_rmse, y_ref+ref_rmse, alpha=0.25, edgecolor='#CC4F1B', facecolor='#FF9848')
+    plt.ylim(bottom=0)
     plt.xlabel("number of tesserae")
     plt.ylabel("Time per gradient calculation [CPUs]")
     plt.legend()
@@ -116,14 +117,25 @@ def plot_grad_times(out, ref):
     model_out = make_pipeline(PolynomialFeatures(degree=2), LinearRegression())
     model_out.fit(x_out, y_out)
 
+    # rmse
+    x_test = np.array(out_nbsf_test)
+    x_test = x_test.reshape(-1, 1)
+    y_test = model_out.predict(x_test)
+    out_rmse = np.sqrt(metrics.mean_squared_error(y_test, out_grad_test))
+    x_test = np.array(ref_nbsf_test)
+    x_test = x_test.reshape(-1, 1)
+    y_test = model_out.predict(x_test)
+    ref_rmse = np.sqrt(metrics.mean_squared_error(y_test, ref_grad_test))
+
     print("Performing quadratic regression of gradient timings to number of basis functions")
     print("old implementation y-intercept:", model_ref.named_steps['linearregression'].intercept_)
     print("old implementation coeffs:", model_ref.named_steps['linearregression'].coef_)
     print("old implementation R²:", model_ref.score(x_ref, y_ref))
-
+    print("old implementation RMSE:", ref_rmse)
     print("new implementation y-intercept:", model_out.named_steps['linearregression'].intercept_)
     print("new implementation coeffs:", model_out.named_steps['linearregression'].coef_)
     print("new implementation R²:", model_out.score(x_out, y_out))
+    print("new implementation RMSE:", out_rmse)
 
     # draw regression lines
     x_out = np.linspace(min(out_nbsf), max(out_nbsf), 500)
@@ -141,6 +153,7 @@ def plot_grad_times(out, ref):
     ref_times.scatter(ref_nbsf, ref_grad_times, label='old implementation', s=3, color='#CC4F1B')
     ref_times.plot(x_ref, y_ref, color='#CC4F1B')
     ref_times.fill_between(x_ref, y_ref-ref_rmse, y_ref+ref_rmse, alpha=0.25, edgecolor='#CC4F1B', facecolor='#FF9848')
+    plt.ylim(bottom=0)
     plt.xlabel("number of basis functions")
     plt.ylabel("Time per gradient calculation [CPUs]")
     plt.legend()

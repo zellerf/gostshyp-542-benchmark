@@ -4,6 +4,8 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
+from sklearn import metrics
+import split_dataset
 
 
 def plot_scf_times(out, ref):
@@ -31,36 +33,60 @@ def plot_scf_times(out, ref):
             print('Error: bad data detected while plotting scf-times')
             sys.exit(1)
 
+    # split into training and test sets
+    out_ntess_train, out_ntess_test = split_dataset.split_dataset(out_ntess)
+    ref_ntess_train, ref_ntess_test = split_dataset.split_dataset(ref_ntess)
+    out_grad_train, out_grad_test = split_dataset.split_dataset(out_scf_times)
+    ref_grad_train, ref_grad_test = split_dataset.split_dataset(ref_scf_times)
+
     # linear regression
-    x_out, y_out = np.array(out_ntess), np.array(out_scf_times)
+    x_out, y_out = np.array(out_ntess_train), np.array(out_grad_train)
     x_out = x_out.reshape(-1, 1)
-    x_ref, y_ref = np.array(ref_ntess), np.array(ref_scf_times)
+    x_ref, y_ref = np.array(ref_ntess_train), np.array(ref_grad_train)
     x_ref = x_ref.reshape(-1, 1)
     model_ref = LinearRegression()
     model_ref.fit(x_ref, y_ref)
     model_out = LinearRegression()
     model_out.fit(x_out, y_out)
 
-    print("Performing linear regression of SCF timings to number of tesserae")
-    print("Q-Chem 5.4.1 y-intercept:", model_ref.intercept_)
-    print("Q-Chem 5.4.1 slope:", model_ref.coef_)
-    print("Q-Chem 5.4.1 R²:", model_ref.score(x_ref, y_ref))
+    # rmse
+    x_test = np.array(out_ntess_test)
+    x_test = x_test.reshape(-1, 1)
+    y_test = model_out.predict(x_test)
+    out_rmse = np.sqrt(metrics.mean_squared_error(y_test, out_grad_test))
+    x_test = np.array(ref_ntess_test)
+    x_test = x_test.reshape(-1, 1)
+    y_test = model_out.predict(x_test)
+    ref_rmse = np.sqrt(metrics.mean_squared_error(y_test, ref_grad_test))
 
-    print("Q-Chem 5.4.2 y-intercept:", model_out.intercept_)
-    print("Q-Chem 5.4.2 Steigung:", model_out.coef_)
-    print("Q-Chem 5.4.2 R²:", model_out.score(x_out, y_out))
+    # print regression metrics
+    print("Performing linear regression of gradient timings to number of tesserae")
+    print("old implementation y-intercept:", model_ref.intercept_)
+    print("old implementation slope:", model_ref.coef_)
+    print("old implementation R²:", model_ref.score(x_ref, y_ref))
+    print("old implementation RMSE:", ref_rmse)
+    print("new implementation y-intercept:", model_out.intercept_)
+    print("new implementation slope:", model_out.coef_)
+    print("new implementation R²:", model_out.score(x_out, y_out))
+    print("new implementation RMSE:", out_rmse)
 
-    # points to draw regression line
-    t = (max(x_out), min(x_out))
+    # draw regression lines
+    x_out = np.linspace(min(out_ntess), max(out_ntess), 500)
+    y_out = model_out.predict(x_out.reshape(-1, 1))
+    x_ref = np.linspace(min(ref_ntess), max(ref_ntess), 500)
+    y_ref = model_ref.predict(x_ref.reshape(-1, 1))
 
     # plot
     fig = plt.figure()
     out_times = plt.subplot()
     ref_times = plt.subplot()
-    out_times.scatter(out_ntess, out_scf_times, label='Q-Chem 5.4.2-dev', s=3)
-    out_times.plot(t, model_out.predict(t))
-    ref_times.scatter(ref_ntess, ref_scf_times, label='Q-Chem 5.4.1', s=3)
-    ref_times.plot(t, model_ref.predict(t))
+    out_times.scatter(out_ntess, out_scf_times, label='new implementation', s=3, color='#1B2ACC')
+    out_times.plot(x_out, y_out, color='#1B2ACC')
+    out_times.fill_between(x_out, y_out-out_rmse, y_out+out_rmse, alpha=0.25, edgecolor='#1B2ACC', facecolor='#089FFF')
+    ref_times.scatter(ref_ntess, ref_scf_times, label='old implementation', s=3, color='#CC4F1B')
+    ref_times.plot(x_ref, y_ref, color='#CC4F1B')
+    ref_times.fill_between(x_ref, y_ref-ref_rmse, y_ref+ref_rmse, alpha=0.25, edgecolor='#CC4F1B', facecolor='#FF9848')
+    plt.ylim(bottom=0)
     plt.xlabel("number of tesserae")
     plt.ylabel("Time per SCF cycle [CPUs]")
     plt.legend()
@@ -77,39 +103,60 @@ def plot_scf_times(out, ref):
             print('Error: bad data detected while plotting scf-times')
             sys.exit(1)
 
+    # split into training and test sets
+    out_nbsf_train, out_nbsf_test = split_dataset.split_dataset(out_nbsf)
+    ref_nbsf_train, ref_nbsf_test = split_dataset.split_dataset(ref_nbsf)
+
     # quadratic regression
-    x_out, y_out = np.array(out_nbsf), np.array(out_scf_times)
+    x_out, y_out = np.array(out_nbsf_train), np.array(out_grad_train)
     x_out = x_out.reshape(-1, 1)
-    x_ref, y_ref = np.array(ref_nbsf), np.array(ref_scf_times)
+    x_ref, y_ref = np.array(ref_nbsf_train), np.array(ref_grad_train)
     x_ref = x_ref.reshape(-1, 1)
     model_ref = make_pipeline(PolynomialFeatures(degree=2), LinearRegression())
     model_ref.fit(x_ref, y_ref)
     model_out = make_pipeline(PolynomialFeatures(degree=2), LinearRegression())
     model_out.fit(x_out, y_out)
 
-    print("Performing quadratic regression of SCF timings to number of basis functions")
-    print("Q-Chem 5.4.1 y-intercept:", model_ref.named_steps['linearregression'].intercept_)
-    print("Q-Chem 5.4.1 coeffs:", model_ref.named_steps['linearregression'].coef_)
-    print("Q-Chem 5.4.1 R²:", model_ref.score(x_ref, y_ref))
+    # rmse
+    x_test = np.array(out_nbsf_test)
+    x_test = x_test.reshape(-1, 1)
+    y_test = model_out.predict(x_test)
+    out_rmse = np.sqrt(metrics.mean_squared_error(y_test, out_grad_test))
+    x_test = np.array(ref_nbsf_test)
+    x_test = x_test.reshape(-1, 1)
+    y_test = model_out.predict(x_test)
+    ref_rmse = np.sqrt(metrics.mean_squared_error(y_test, ref_grad_test))
 
-    print("Q-Chem 5.4.2 y-intercept:", model_out.named_steps['linearregression'].intercept_)
-    print("Q-Chem 5.4.2 coeffs:", model_out.named_steps['linearregression'].coef_)
-    print("Q-Chem 5.4.2 R²:", model_out.score(x_out, y_out))
+    print("Performing quadratic regression of gradient timings to number of basis functions")
+    print("old implementation y-intercept:", model_ref.named_steps['linearregression'].intercept_)
+    print("old implementation coeffs:", model_ref.named_steps['linearregression'].coef_)
+    print("old implementation R²:", model_ref.score(x_ref, y_ref))
+    print("old implementation RMSE:", ref_rmse)
 
-    # create data points to plot regression data
-    x_outseq = np.linspace(x_out.min(),x_out.max(),500).reshape(-1,1)
-    x_refseq = np.linspace(x_ref.min(),x_ref.max(),500).reshape(-1,1)
+    print("new implementation y-intercept:", model_out.named_steps['linearregression'].intercept_)
+    print("new implementation coeffs:", model_out.named_steps['linearregression'].coef_)
+    print("new implementation R²:", model_out.score(x_out, y_out))
+    print("new implementation RMSE:", out_rmse)
 
-    #plot
+    # draw regression lines
+    x_out = np.linspace(min(out_nbsf), max(out_nbsf), 500)
+    y_out = model_out.predict(x_out.reshape(-1, 1))
+    x_ref = np.linspace(min(ref_nbsf), max(ref_nbsf), 500)
+    y_ref = model_ref.predict(x_ref.reshape(-1, 1))
+
+    # plot
     fig = plt.figure()
     out_times = plt.subplot()
     ref_times = plt.subplot()
-    out_times.scatter(out_nbsf, out_scf_times, label='Q-Chem 5.4.2-dev', s=3)
-    out_times.plot(x_outseq, model_out.predict(x_outseq))
-    ref_times.scatter(ref_nbsf, ref_scf_times, label='Q-Chem 5.4.1', s=3)
-    ref_times.plot(x_refseq, model_ref.predict(x_refseq))
+    out_times.scatter(out_nbsf, out_scf_times, label='new implementation', s=3, color='#1B2ACC')
+    out_times.plot(x_out, y_out, color='#1B2ACC')
+    out_times.fill_between(x_out, y_out-out_rmse, y_out+out_rmse, alpha=0.25, edgecolor='#1B2ACC', facecolor='#089FFF')
+    ref_times.scatter(ref_nbsf, ref_scf_times, label='old implementation', s=3, color='#CC4F1B')
+    ref_times.plot(x_ref, y_ref, color='#CC4F1B')
+    ref_times.fill_between(x_ref, y_ref-ref_rmse, y_ref+ref_rmse, alpha=0.25, edgecolor='#CC4F1B', facecolor='#FF9848')
     plt.xlabel("number of basis functions")
     plt.ylabel("Time per SCF cycle [CPUs]")
+    plt.ylim(bottom=0)
     plt.legend()
     fig.savefig("scf_times_nbsf.pdf")
     plt.close(fig)

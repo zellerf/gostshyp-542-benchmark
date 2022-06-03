@@ -6,8 +6,6 @@ import sys
 # [out] train training set in a list
 # [out] test test set in a list
 def split_dataset(data):
-
-    print("call split dataset")
     if not isinstance(data, list):
         print("Error passed data to function split data set does not have type list!")
         sys.exit(1)
