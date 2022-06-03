@@ -1,6 +1,7 @@
 # This is the main script
 # usage: python3 evaluate_benmchmark.py
 # use -plotmem=true option to also obtain memory plots. (this needs a manipulated qchem version to work)
+
 import os
 import statistics
 import sys

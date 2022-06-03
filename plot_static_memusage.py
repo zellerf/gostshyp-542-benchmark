@@ -53,10 +53,10 @@ def plot_memusage(out, ref):
 
     # print metrics
     print("Performing linear regression of gostshyp static mem to number of tesserae")
-    print("Q-Chem 5.4.2 y-intercept:", model_out.intercept_)
-    print("Q-Chem 5.4.2 Steigung:", model_out.coef_)
-    print("Q-Chem 5.4.2 R²:", model_out.score(x_out, y_out))
-    print("Q-Chem 5.4.2 RMSE:", rmse)
+    print("new implementation y-intercept:", model_out.intercept_)
+    print("new implementation Steigung:", model_out.coef_)
+    print("new implementation R²:", model_out.score(x_out, y_out))
+    print("new implementation RMSE:", rmse)
 
     # draw regression line
     x = np.linspace(min(out_ntess), max(out_ntess), 500)
@@ -66,10 +66,10 @@ def plot_memusage(out, ref):
     fig = plt.figure()
     out_times = plt.subplot()
     ref_times = plt.subplot()
-    out_times.scatter(out_ntess, out_mem, label='Q-Chem 5.4.2-dev', s=3, color='#1B2ACC')
+    out_times.scatter(out_ntess, out_mem, label='new implementation', s=3, color='#1B2ACC')
     out_times.plot(x, y, color='#1B2ACC')
     out_times.fill_between(x, y-rmse, y+rmse, alpha=0.25, edgecolor='#1B2ACC', facecolor='#089FFF')
-    ref_times.scatter(ref_ntess, ref_mem, label='Q-Chem 5.4.1', s=3, color='#CC4F1B')
+    ref_times.scatter(ref_ntess, ref_mem, label='old implementation', s=3, color='#CC4F1B')
     plt.xlabel("number of tesserae")
     plt.ylabel("maximum mem usage [MB]")
     plt.legend()
@@ -77,31 +77,40 @@ def plot_memusage(out, ref):
     plt.close(fig)
 
     # quadratic regression
-    x_out, y_out = np.array(out_nbsf), np.array(out_mem)
+    x_out, y_out = np.array(out_nbsf_train), np.array(out_mem_train)
     x_out = x_out.reshape(-1, 1)
     model_out = make_pipeline(PolynomialFeatures(degree=2), LinearRegression())
     model_out.fit(x_out, y_out)
 
+    # rmse
+    x_test = np.array(out_nbsf_test)
+    x_test = x_test.reshape(-1, 1)
+    y_test = model_out.predict(x_test)
+    rmse = np.sqrt(metrics.mean_squared_error(y_test, out_mem_test))
+
     print("Performing quadratic regression of mem usage to number of basis functions")
-    print("Q-Chem 5.4.2 y-intercept:", model_out.named_steps['linearregression'].intercept_)
-    print("Q-Chem 5.4.2 coeffs:", model_out.named_steps['linearregression'].coef_)
-    print("Q-Chem 5.4.2 R²:", model_out.score(x_out, y_out))
+    print("new implementation y-intercept:", model_out.named_steps['linearregression'].intercept_)
+    print("new implementation coeffs:", model_out.named_steps['linearregression'].coef_)
+    print("new implementation R²:", model_out.score(x_out, y_out))
+    print("new implementation RMSE:", rmse)
 
     # create data points to plot regression data
-    x_outseq = np.linspace(x_out.min(), x_out.max(), 500).reshape(-1, 1)
-
+    x = np.linspace(x_out.min(), x_out.max(), 500)
+    y = model_out.predict(x.reshape(-1, 1))
     # plot
     fig = plt.figure()
     out_times = plt.subplot()
     ref_times = plt.subplot()
-    out_times.scatter(out_nbsf, out_mem, label='Q-Chem 5.4.2-dev', s=3)
-    out_times.plot(x_outseq, model_out.predict(x_outseq))
-    ref_times.scatter(ref_nbsf, ref_mem, label='Q-Chem 5.4.1', s=3)
+    out_times.scatter(out_nbsf, out_mem, label='new implementation', s=3, color='#1B2ACC')
+    out_times.plot(x, y, color='#1B2ACC')
+    out_times.fill_between(x, y-rmse, y+rmse, alpha=0.25, edgecolor='#1B2ACC', facecolor='#089FFF')
+    ref_times.scatter(ref_nbsf, ref_mem, label='old implementation', s=3, color='#CC4F1B')
     plt.xlabel("number of basis functions")
     plt.ylabel("maximum mem usage [MB]")
     plt.legend()
     fig.savefig("mem_nbsf.pdf")
     plt.close(fig)
+
 
 # max mem usage is easily calculatable for old implementation, since the overlap matrices are not sparse
 # max mem usage = nbsf ** 2 * ntess * 5 * sizeof(double)
