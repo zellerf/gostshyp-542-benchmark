@@ -61,13 +61,13 @@ def plot_grad_times(out, ref):
 
     # print regression metrics
     print("Performing linear regression of gradient timings to number of tesserae")
-    print("Q-Chem 5.4.1 y-intercept:", model_ref.intercept_)
-    print("Q-Chem 5.4.1 slope:", model_ref.coef_)
-    print("Q-Chem 5.4.1 R²:", model_ref.score(x_ref, y_ref))
-    print("new implementation RMSE:", out_rmse)
-    print("Q-Chem 5.4.2 y-intercept:", model_out.intercept_)
-    print("Q-Chem 5.4.2 slope:", model_out.coef_)
-    print("Q-Chem 5.4.2 R²:", model_out.score(x_out, y_out))
+    print("old implementation y-intercept:", model_ref.intercept_)
+    print("old implementation slope:", model_ref.coef_)
+    print("old implementation R²:", model_ref.score(x_ref, y_ref))
+    print("old implementation RMSE:", ref_rmse)
+    print("new implementation y-intercept:", model_out.intercept_)
+    print("new implementation slope:", model_out.coef_)
+    print("new implementation R²:", model_out.score(x_out, y_out))
     print("new implementation RMSE:", out_rmse)
 
     # draw regression lines
@@ -117,13 +117,13 @@ def plot_grad_times(out, ref):
     model_out.fit(x_out, y_out)
 
     print("Performing quadratic regression of gradient timings to number of basis functions")
-    print("Q-Chem 5.4.1 y-intercept:", model_ref.named_steps['linearregression'].intercept_)
-    print("Q-Chem 5.4.1 coeffs:", model_ref.named_steps['linearregression'].coef_)
-    print("Q-Chem 5.4.1 R²:", model_ref.score(x_ref, y_ref))
+    print("old implementation y-intercept:", model_ref.named_steps['linearregression'].intercept_)
+    print("old implementation coeffs:", model_ref.named_steps['linearregression'].coef_)
+    print("old implementation R²:", model_ref.score(x_ref, y_ref))
 
-    print("Q-Chem 5.4.2 y-intercept:", model_out.named_steps['linearregression'].intercept_)
-    print("Q-Chem 5.4.2 coeffs:", model_out.named_steps['linearregression'].coef_)
-    print("Q-Chem 5.4.2 R²:", model_out.score(x_out, y_out))
+    print("new implementation y-intercept:", model_out.named_steps['linearregression'].intercept_)
+    print("new implementation coeffs:", model_out.named_steps['linearregression'].coef_)
+    print("new implementation R²:", model_out.score(x_out, y_out))
 
     # draw regression lines
     x_out = np.linspace(min(out_nbsf), max(out_nbsf), 500)
